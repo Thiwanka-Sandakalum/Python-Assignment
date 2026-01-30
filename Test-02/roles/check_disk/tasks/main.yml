@@ -1,0 +1,30 @@
+---
+- name: Calculate disk usage exceeding threshold
+  set_fact:
+    high_disk_usage: >-
+      {{
+        ansible_mounts
+        | selectattr('size_total', 'defined')
+        | selectattr('size_available', 'defined')
+        | selectattr('size_total', 'gt', 0)
+        | selectattr('size_available', 'lt', (item.size_total * (100 - disk_threshold) / 100))
+      }}
+  loop: "{{ ansible_mounts }}"
+  when: ansible_mounts is defined
+
+- name: Report high disk usage
+  debug:
+    msg: "Disk usage exceeded {{ disk_threshold }}% on {{ inventory_hostname }}"
+  when: high_disk_usage is defined and high_disk_usage | length > 0
+
+- name: Send alert email
+  mail:
+    host: localhost
+    port: 25
+    to: "{{ alert_email }}"
+    subject: "ALERT: High Disk Usage on {{ inventory_hostname }}"
+    body: |
+      The following disks exceeded {{ disk_threshold }}% usage:
+
+      {{ high_disk_usage | to_nice_json }}
+  when: high_disk_usage is defined and high_disk_usage | length > 0

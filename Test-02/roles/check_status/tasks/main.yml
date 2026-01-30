@@ -1,0 +1,28 @@
+---
+- name: Query RBC application health endpoint
+  uri:
+    url: "{{ api_endpoint }}"
+    method: GET
+    return_content: yes
+  register: api_response
+  delegate_to: localhost
+  run_once: true
+
+- name: Display full application status
+  debug:
+    msg: "{{ api_response.json }}"
+
+- name: Extract down services
+  set_fact:
+    down_services: >-
+      {{
+        api_response.json.services
+        | selectattr('service_status', 'equalto', 'DOWN')
+        | list
+      }}
+  when: api_response.json.services is defined
+
+- name: Report services that are DOWN
+  debug:
+    msg: "Services DOWN: {{ down_services }}"
+  when: down_services | length > 0

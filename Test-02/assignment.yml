@@ -1,0 +1,19 @@
+---
+- name: RBC Application Automation
+  hosts: rbcapp
+  gather_facts: yes
+
+  vars:
+    disk_threshold: 80
+    alert_email: "thiwanka@logs.com"
+    api_endpoint: "http://127.0.0.1:8000/healthcheck"
+
+  roles:
+    - role: verify_install
+      when: action == "verify_install"
+
+    - role: check_disk
+      when: action == "check-disk"
+
+    - role: check_status
+      when: action == "check-status"
