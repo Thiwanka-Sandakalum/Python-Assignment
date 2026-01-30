@@ -34,9 +34,3 @@ ansible-playbook assignment.yml -i inventory -e action=check-disk
 ```
 ansible-playbook assignment.yml -i inventory -e action=check-status
 ```
-
-
-## Extensibility
-- Add more roles for other automation needs.
-- Easily integrate with CI/CD or Ansible Tower/AWX.
-- Inventory and roles are modular for scaling.

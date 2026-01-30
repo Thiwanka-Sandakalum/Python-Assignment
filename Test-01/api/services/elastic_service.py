@@ -1,5 +1,6 @@
+from services.interfaces import IElasticService
 
-class ElasticService:
+class ElasticService(IElasticService):
     def __init__(self, client, index_name):
         self.client = client
         self.index_name = index_name
